@@ -1,0 +1,2 @@
+webUrl - ссылка на товар
+merchantName - магазин
