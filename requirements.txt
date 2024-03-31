@@ -1,0 +1,4 @@
+aiogram==2.22.1
+asgiref==3.7.2
+tls_client==0.2.2
+urlextract==1.8.0
