@@ -399,7 +399,7 @@ async def started(message: types.Message, state: FSMContext):
     markup.add(InlineKeyboardButton(text="❌Закрыть", callback_data="start"))
 
     if proxy["message_add_proxy"] != "стоп" and '@' in message.text and ':' in message.text:
-        baseMain.execute(f'UPDATE users SET proxy = {message.text} WHERE user_id = "{message.from_user.id}"')
+        baseMain.execute(f'UPDATE users SET proxy = "{message.text}" WHERE user_id = {message.from_user.id}')
         baseMain.commit()
         userinfo = baseMain.execute(f'SELECT * FROM users WHERE user_id = "{message.from_user.id}"').fetchone()
         await message.answer(f"⚙️Настройки пользователя: {userinfo[1]} \n\n📉Минимальная цена: {userinfo[2]} руб.\n📈Максимальная цена: {userinfo[3]} руб.\n🚚Тип доставки: {userinfo[4]} \n💸От какого % бонусов искать: {userinfo[5]}%\nПрокси: {userinfo[6]}", reply_markup=markup)

@@ -5,7 +5,7 @@ def get_id_link(link_str, proxy_str):
         client_identifier="chrome112",
         random_tls_extension_order=True
     )
-    proxies = { 'https' : f'https://{proxy_str}' } 
+    proxies = { 'https': f'https://{proxy_str}' } 
     session.proxies.update(proxies)
 
     cookies = {
@@ -134,7 +134,7 @@ def get_id_link(link_str, proxy_str):
         headers=headers,
         json=json_data,
     ).json()
-
+    print(response)
     try:
         link = response['params']['collection']['collectionId']
         return link

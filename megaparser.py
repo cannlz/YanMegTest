@@ -9,7 +9,7 @@ def parser_mega(delivery_type, min_price, max_price, search_query, min_precent_b
         client_identifier="chrome112",
         random_tls_extension_order=True
     )
-    proxies = { 'https' : f'https://{proxy_str}' } 
+    proxies = { 'https': f'https://{proxy_str}' }
     session.proxies.update(proxies)
 
     cookies = {
