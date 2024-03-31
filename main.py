@@ -23,50 +23,52 @@ class AwaitMessages(StatesGroup):
     message_type_delivery = State()
     message_bonus = State()
     message_add_link = State()
+    message_add_proxy = State()
 
 
 
 async def scheduled(wait_for):
   while True:
-    settings_user = baseMain.execute(f'SELECT user_id, min_price, max_price, delivery_type, min_precent_bonus FROM users').fetchall()
+    settings_user = baseMain.execute(f'SELECT user_id, min_price, max_price, delivery_type, min_precent_bonus, proxy FROM users').fetchall()
     
     list_delivery = ['UNKNOWN_OFFER_DUE_DATE', 'COLLECT_TODAY_OFFER_DUE_DATE', 'DEFAULT_DELIVERY_OFFER_DUE_DATE']
 
     for one_user in settings_user:
-        userinfo = baseMain.execute(f'SELECT link_id, search_query FROM list_data WHERE user_id = {one_user[0]}').fetchall()
-        for i in range(0,2):
-            for one_line in userinfo:
-                if one_line[i] is not None:
-                    sleep(random.randint(10,20))
-                    if i == 0:
-                        if one_user[3] == 'all_types_delivery':
-                            for one_delivery in list_delivery:
-                                good_links = await sync_to_async (parser_mega)(one_delivery, one_user[1], one_user[2],  None, one_user[4], one_line[i])
-                                sleep(random.randint(5,10))
-                        else:
-                            good_links = await sync_to_async (parser_mega)(one_user[3], one_user[1], one_user[2],  None, one_user[4], one_line[i])
-                    elif i == 1:
-                        if one_user[3] == 'all_types_delivery':
-                            for one_delivery in list_delivery:
-                                good_links = await sync_to_async (parser_mega)(one_delivery, one_user[1], one_user[2], one_line[i], one_user[4], None)
-                                sleep(random.randint(5,10))
-                        else:
-                            good_links = await sync_to_async (parser_mega)(one_user[3], one_user[1], one_user[2], one_line[i], one_user[4], None)
+        if one_user[5] != 'Отсутствуют':
+            userinfo = baseMain.execute(f'SELECT link_id, search_query FROM list_data WHERE user_id = {one_user[0]}').fetchall()
+            for i in range(0,2):
+                for one_line in userinfo:
+                    if one_line[i] is not None:
+                        sleep(random.randint(10,20))
+                        if i == 0:
+                            if one_user[3] == 'all_types_delivery':
+                                for one_delivery in list_delivery:
+                                    good_links = await sync_to_async (parser_mega)(one_delivery, one_user[1], one_user[2],  None, one_user[4], one_line[i], one_user[5])
+                                    sleep(random.randint(5,10))
+                            else:
+                                good_links = await sync_to_async (parser_mega)(one_user[3], one_user[1], one_user[2],  None, one_user[4], one_line[i], one_user[5])
+                        elif i == 1:
+                            if one_user[3] == 'all_types_delivery':
+                                for one_delivery in list_delivery:
+                                    good_links = await sync_to_async (parser_mega)(one_delivery, one_user[1], one_user[2], one_line[i], one_user[4], None, one_user[5])
+                                    sleep(random.randint(5,10))
+                            else:
+                                good_links = await sync_to_async (parser_mega)(one_user[3], one_user[1], one_user[2], one_line[i], one_user[4], None, one_user[5])
 
-                    for one_message in good_links:
-                        check_sended_links = baseMain.execute(f'SELECT link, price, precent_bonus FROM used_links WHERE link = "{one_message[4]}"').fetchone()
-                        if check_sended_links is not None:
-                            if check_sended_links[1] > int(one_message[0]) or check_sended_links[1] < int(one_message[0]):
-                                baseMain.execute(f'UPDATE used_links SET price = {one_message[0]} WHERE link = "{one_message[4]}"')
+                        for one_message in good_links:
+                            check_sended_links = baseMain.execute(f'SELECT link, price, precent_bonus FROM used_links WHERE link = "{one_message[4]}"').fetchone()
+                            if check_sended_links is not None:
+                                if check_sended_links[1] > int(one_message[0]) or check_sended_links[1] < int(one_message[0]):
+                                    baseMain.execute(f'UPDATE used_links SET price = {one_message[0]} WHERE link = "{one_message[4]}"')
+                                    baseMain.commit()
+                                
+                                if check_sended_links[2] > int(one_message[1]) or check_sended_links[2] < int(one_message[1]):
+                                    baseMain.execute(f'UPDATE used_links SET precent_bonus = {one_message[1]} WHERE link = "{one_message[4]}"')
+                                    baseMain.commit() 
+                            else:
+                                baseMain.execute(f'INSERT INTO used_links (link, price, precent_bonus) VALUES ("{one_message[4]}", {one_message[0]}, {one_message[1]});')
                                 baseMain.commit()
-                            
-                            if check_sended_links[2] > int(one_message[1]) or check_sended_links[2] < int(one_message[1]):
-                                baseMain.execute(f'UPDATE used_links SET precent_bonus = {one_message[1]} WHERE link = "{one_message[4]}"')
-                                baseMain.commit() 
-                        else:
-                            baseMain.execute(f'INSERT INTO used_links (link, price, precent_bonus) VALUES ("{one_message[4]}", {one_message[0]}, {one_message[1]});')
-                            baseMain.commit()
-                            await bot.send_photo(chat_id=one_user[0], photo=one_message[5], caption=f'Название: {one_message[6]}\n\nЦена: {one_message[0]} руб.\nПроцент бонусов: {one_message[1]}%\nКоличество бонусов: {one_message[2]}\nПродавец: {one_message[3]}\n\nСсылка на товар: {one_message[4]}', parse_mode='HTML')
+                                await bot.send_photo(chat_id=one_user[0], photo=one_message[5], caption=f'Название: {one_message[6]}\n\nЦена: {one_message[0]} руб.\nПроцент бонусов: {one_message[1]}%\nКоличество бонусов: {one_message[2]}\nПродавец: {one_message[3]}\n\nСсылка на товар: {one_message[4]}', parse_mode='HTML')
                 
     await asyncio.sleep(wait_for)
 
@@ -83,7 +85,8 @@ async def process_start_command(message: types.Message):
     btn_bonus = types.KeyboardButton("💸% бонусов")
     btn_add_link = types.KeyboardButton("🔗Добавить ссылку")
     btn_status = types.KeyboardButton("⚙️Мои настройки")
-    keyboard_markup.add(btn_add_link, btn_min_price, btn_max_price, btn_delivery, btn_bonus, btn_status)
+    btn_proxy = types.KeyboardButton("🌐Добавить прокси")
+    keyboard_markup.add(btn_add_link, btn_min_price, btn_max_price, btn_delivery, btn_bonus, btn_status, btn_proxy)
     try:
         check_user_base = baseMain.execute(f'SELECT user_id FROM users WHERE user_id = "{message.from_user.id}"').fetchone()
         check_user_links_base = baseMain.execute(f'SELECT user_id FROM list_data WHERE user_id = "{message.from_user.id}"').fetchone()
@@ -114,7 +117,8 @@ async def start_callback(call: types.CallbackQuery):
     btn_bonus = types.KeyboardButton("💸% бонусов")
     btn_add_link = types.KeyboardButton("🔗Добавить ссылку")
     btn_status = types.KeyboardButton("⚙️Мои настройки")
-    keyboard_markup.add(btn_add_link, btn_min_price, btn_max_price, btn_delivery, btn_bonus, btn_status)
+    btn_proxy = types.KeyboardButton("🌐Добавить прокси")
+    keyboard_markup.add(btn_add_link, btn_min_price, btn_max_price, btn_delivery, btn_bonus, btn_status, btn_proxy)
     await bot.send_message(text="Мегамаркет парсер", chat_id=call.from_user.id, reply_markup=keyboard_markup)
 
 
@@ -137,7 +141,7 @@ async def parser(message: types.Message):
         markup.add(InlineKeyboardButton(i, callback_data=i)) #Создаём кнопки, i[1] - название, i[2] - каллбек дата
     markup.add(InlineKeyboardButton(text="❌Закрыть", callback_data="start"))
     userinfo = baseMain.execute(f'SELECT * FROM users WHERE user_id = "{message.from_user.id}"').fetchone()
-    await message.answer(f"⚙️Настройки пользователя: {userinfo[1]} \n\n📉Минимальная цена: {userinfo[2]} руб.\n📈Максимальная цена: {userinfo[3]} руб.\n🚚Тип доставки: {userinfo[4]} \n💸От какого % бонусов искать: {userinfo[5]}%\n\nДля удаления ссылки/ключевого запроса, нажмите на кнопку, которую хотите удалить", reply_markup=markup)
+    await message.answer(f"⚙️Настройки пользователя: {userinfo[1]} \n\n📉Минимальная цена: {userinfo[2]} руб.\n📈Максимальная цена: {userinfo[3]} руб.\n🚚Тип доставки: {userinfo[4]} \n💸От какого % бонусов искать: {userinfo[5]}%\nПрокси: {userinfo[6]}\n\nДля удаления ссылки/ключевого запроса, нажмите на кнопку, которую хотите удалить", reply_markup=markup)
 
 #ОБРАБОТЧИК ГЕНЕРАЦИИ КНОПОК С ССЫЛКАМИ
 @dp.callback_query_handler(lambda call: True)
@@ -195,7 +199,7 @@ async def started(message: types.Message, state: FSMContext):
         baseMain.execute(f'UPDATE users SET min_price = {message.text} WHERE user_id = "{message.from_user.id}"')
         baseMain.commit()
         userinfo = baseMain.execute(f'SELECT * FROM users WHERE user_id = "{message.from_user.id}"').fetchone()
-        await message.answer(f"⚙️Настройки пользователя: {userinfo[1]} \n\n📉Минимальная цена: {userinfo[2]} руб.\n📈Максимальная цена: {userinfo[3]} руб.\n🚚Тип доставки: {userinfo[4]} \n💸От какого % бонусов искать: {userinfo[5]}%", reply_markup=markup)
+        await message.answer(f"⚙️Настройки пользователя: {userinfo[1]} \n\n📉Минимальная цена: {userinfo[2]} руб.\n📈Максимальная цена: {userinfo[3]} руб.\n🚚Тип доставки: {userinfo[4]} \n💸От какого % бонусов искать: {userinfo[5]}%\nПрокси: {userinfo[6]}", reply_markup=markup)
         await state.finish()  # Выключаем состояние
     else:
         await message.answer(f'❌Действие отменено или введён неверный тип данных\nЭто "{message.text}" точно число?', reply_markup=markup)
@@ -228,7 +232,7 @@ async def started(message: types.Message, state: FSMContext):
         baseMain.execute(f'UPDATE users SET max_price = {message.text} WHERE user_id = "{message.from_user.id}"')
         baseMain.commit()
         userinfo = baseMain.execute(f'SELECT * FROM users WHERE user_id = "{message.from_user.id}"').fetchone()
-        await message.answer(f"⚙️Настройки пользователя: {userinfo[1]} \n\n📉Минимальная цена: {userinfo[2]} руб.\n📈Максимальная цена: {userinfo[3]} руб.\n🚚Тип доставки: {userinfo[4]} \n💸От какого % бонусов искать: {userinfo[5]}%", reply_markup=markup)
+        await message.answer(f"⚙️Настройки пользователя: {userinfo[1]} \n\n📉Минимальная цена: {userinfo[2]} руб.\n📈Максимальная цена: {userinfo[3]} руб.\n🚚Тип доставки: {userinfo[4]} \n💸От какого % бонусов искать: {userinfo[5]}%\nПрокси: {userinfo[6]}", reply_markup=markup)
         await state.finish()  # Выключаем состояние
     else:
         await message.answer(f'❌Действие отменено или введён неверный тип данных\nЭто "{message.text}" точно число?', reply_markup=markup)
@@ -266,7 +270,7 @@ async def echos(callback_query: types.CallbackQuery, state: FSMContext):
         baseMain.execute(f'UPDATE users SET delivery_type = "{callback_query.data}" WHERE user_id = "{callback_query.from_user.id}"')
         baseMain.commit()
         userinfo = baseMain.execute(f'SELECT * FROM users WHERE user_id = "{callback_query.from_user.id}"').fetchone()
-        await bot.send_message(chat_id=callback_query.from_user.id, text=f"⚙️Настройки пользователя: {userinfo[1]} \n\n📉Минимальная цена: {userinfo[2]} руб.\n📈Максимальная цена: {userinfo[3]} руб.\n🚚Тип доставки: {userinfo[4]} \n💸От какого % бонусов искать: {userinfo[5]}%", reply_markup=markup)
+        await bot.send_message(chat_id=callback_query.from_user.id, text=f"⚙️Настройки пользователя: {userinfo[1]} \n\n📉Минимальная цена: {userinfo[2]} руб.\n📈Максимальная цена: {userinfo[3]} руб.\n🚚Тип доставки: {userinfo[4]} \n💸От какого % бонусов искать: {userinfo[5]}%\nПрокси: {userinfo[6]}", reply_markup=markup)
         await state.finish()  # Выключаем состояние
     else:
         await callback_query.message.delete()
@@ -300,7 +304,7 @@ async def started(message: types.Message, state: FSMContext):
         baseMain.execute(f'UPDATE users SET min_precent_bonus = {message.text} WHERE user_id = "{message.from_user.id}"')
         baseMain.commit()
         userinfo = baseMain.execute(f'SELECT * FROM users WHERE user_id = "{message.from_user.id}"').fetchone()
-        await message.answer(f"⚙️Настройки пользователя: {userinfo[1]} \n\n📉Минимальная цена: {userinfo[2]} руб.\n📈Максимальная цена: {userinfo[3]} руб.\n🚚Тип доставки: {userinfo[4]} \n💸От какого % бонусов искать: {userinfo[5]}%", reply_markup=markup)
+        await message.answer(f"⚙️Настройки пользователя: {userinfo[1]} \n\n📉Минимальная цена: {userinfo[2]} руб.\n📈Максимальная цена: {userinfo[3]} руб.\n🚚Тип доставки: {userinfo[4]} \n💸От какого % бонусов искать: {userinfo[5]}%\nПрокси: {userinfo[6]}", reply_markup=markup)
         await state.finish()  # Выключаем состояние
     else:
         await message.answer(f'❌Действие отменено или введён неверный тип данных\nЭто "{message.text}" точно число?', reply_markup=markup)
@@ -341,7 +345,8 @@ async def started(message: types.Message, state: FSMContext):
         try:
             urls = extractor.find_urls(message.text)
             if len(urls) > 0:
-                url_id = get_id_link(urls[0])
+                proxy = baseMain.execute(f'SELECT proxy FROM users WHERE user_id = {message.from_user.id}').fetchone()
+                url_id = get_id_link(urls[0], proxy[0])
             else:
                 check_url = True
                 urls = False
@@ -368,6 +373,39 @@ async def started(message: types.Message, state: FSMContext):
         await state.finish()  # Выключаем состояние
     else:
         await message.answer(f'❌Действие отменено или возникла ошибка', reply_markup=markup)
+        await state.finish()
+
+    await state.finish()
+
+
+#ДОБАВЛЕНИЕ ПРОКСИ
+@dp.message_handler(lambda message: message.text == "🌐Добавить прокси")
+async def parser(message: types.Message):
+    markup = InlineKeyboardMarkup()  # создаём клавиатуру
+    markup.row_width = 1  # кол-во кнопок в строке
+    markup.add(InlineKeyboardButton(text="❌Закрыть", callback_data="start"))
+    await message.delete()
+    await message.answer("Введите строку с прокси РОССИЯ http/https(1 шт):\n\nФормат прокси: username:password@ip:port", reply_markup=markup)
+    await AwaitMessages.message_add_proxy.set()
+
+#ДОБАВЛЕНИЕ ПРОКСИ FSM МАШИНА
+@dp.message_handler(state=AwaitMessages.message_add_proxy)  # Принимаем состояние
+async def started(message: types.Message, state: FSMContext):
+    async with state.proxy() as proxy:  # Устанавливаем состояние ожидания
+        proxy['message_add_proxy'] = message.text
+    
+    markup = InlineKeyboardMarkup()  # создаём клавиатуру
+    markup.row_width = 1  # кол-во кнопок в строке
+    markup.add(InlineKeyboardButton(text="❌Закрыть", callback_data="start"))
+
+    if proxy["message_add_proxy"] != "стоп" and '@' in message.text and ':' in message.text:
+        baseMain.execute(f'UPDATE users SET proxy = {message.text} WHERE user_id = "{message.from_user.id}"')
+        baseMain.commit()
+        userinfo = baseMain.execute(f'SELECT * FROM users WHERE user_id = "{message.from_user.id}"').fetchone()
+        await message.answer(f"⚙️Настройки пользователя: {userinfo[1]} \n\n📉Минимальная цена: {userinfo[2]} руб.\n📈Максимальная цена: {userinfo[3]} руб.\n🚚Тип доставки: {userinfo[4]} \n💸От какого % бонусов искать: {userinfo[5]}%\nПрокси: {userinfo[6]}", reply_markup=markup)
+        await state.finish()  # Выключаем состояние
+    else:
+        await message.answer(f'❌Действие отменено или введён неверный тип данных\nФормат прокси: username:password@ip:port', reply_markup=markup)
         await state.finish()
 
     await state.finish()

@@ -1,10 +1,12 @@
 import tls_client
 
-def get_id_link(link_str):
+def get_id_link(link_str, proxy_str):
     session = tls_client.Session(
         client_identifier="chrome112",
         random_tls_extension_order=True
     )
+    proxies = { 'https' : f'https://{proxy_str}' } 
+    session.proxies.update(proxies)
 
     cookies = {
         'spid': '1691248327816_541d895417a4ec2f5cad563effefd88c_o92886xo5rqsjwsc',

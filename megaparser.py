@@ -3,12 +3,14 @@ from time import sleep
 import random
 
 
-def parser_mega(delivery_type, min_price, max_price, search_query, min_precent_bonus, link_id):
+def parser_mega(delivery_type, min_price, max_price, search_query, min_precent_bonus, link_id, proxy_str):
 
     session = tls_client.Session(
         client_identifier="chrome112",
         random_tls_extension_order=True
     )
+    proxies = { 'https' : f'https://{proxy_str}' } 
+    session.proxies.update(proxies)
 
     cookies = {
         'spid': '1691248327816_541d895417a4ec2f5cad563effefd88c_o92886xo5rqsjwsc',
@@ -289,7 +291,6 @@ def parser_mega(delivery_type, min_price, max_price, search_query, min_precent_b
             json=json_data,
         ).json()
 
-        print(response)
         list_goods = []
         for i in range(44):
             try:
