@@ -138,23 +138,18 @@ def get_id_link(link_str, proxy_str):
             cookies=cookies,
             headers=headers,
             json=json_data,
-        )
-        print(response.status_code)
-        if 'error' in response.text:
-            print('error')
-            try:
-                print(response.text)
-            except Exception as e:
-                print(e)
+        ).json()
+        
+        print(response)
         try:
-            link = response.json()['params']['collection']['collectionId']
+            link = response['params']['collection']['collectionId']
             return link
         except:
             link = ''
 
         if link == '':
             try:
-                link = response.json()['params']['menuNode']['collection']['collectionId']
+                link = response['params']['menuNode']['collection']['collectionId']
                 return link
             except:
                 link = ''
