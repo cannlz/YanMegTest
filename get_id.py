@@ -142,7 +142,8 @@ def get_id_link(link_str, proxy_str):
                 json=json_data,
             )
             print(response.status_code)
-            print(response.text)
+            if 'error' in response.text:
+                print('error')
             try:
                 link = response.json()['params']['collection']['collectionId']
                 return link
