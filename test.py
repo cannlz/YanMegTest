@@ -1,5 +1,6 @@
 import tls_client
 
+
 def get_id_link(link_str, proxy_str):
 
     client_identifier_list = ['chrome_103', 'chrome_104', 'chrome_105', 'chrome_106', 'chrome_107', 'chrome_108', 'chrome109', 'Chrome110', 'chrome111', 'chrome112', 'chrome_116_PSK', 'chrome_116_PSK_PQ', 'chrome_117', 'chrome_120', 'firefox_102', 'firefox_104', 'firefox108', 'Firefox110', 'firefox_117', 'firefox_120', 'opera_89', 'opera_90', 'safari_15_3', 'safari_15_6_1', 'safari_16_0', 'safari_ios_15_5', 'safari_ios_15_6', 'safari_ios_16_0', 'safari_ios_15_6', 'okhttp4_android_7', 'okhttp4_android_8', 'okhttp4_android_9', 'okhttp4_android_10', 'okhttp4_android_11', 'okhttp4_android_12', 'okhttp4_android_13']
@@ -10,8 +11,8 @@ def get_id_link(link_str, proxy_str):
             client_identifier=client_str,
             random_tls_extension_order=True
         )
-        proxies = {'https': f'http://{proxy_str}'}
-        session.proxies.update(proxies)
+        #proxies = {'https': f'http://{proxy_str}'}
+        #session.proxies.update(proxies)
 
         cookies = {
             'spid': '1691248327816_541d895417a4ec2f5cad563effefd88c_o92886xo5rqsjwsc',
@@ -138,7 +139,7 @@ def get_id_link(link_str, proxy_str):
             cookies=cookies,
             headers=headers,
             json=json_data,
-            #proxy=f'http://{proxy_str}',
+            proxy=f'http://{proxy_str}',
         )
         print(response.status_code)
         print(response.text)

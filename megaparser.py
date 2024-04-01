@@ -9,8 +9,6 @@ def parser_mega(delivery_type, min_price, max_price, search_query, min_precent_b
         client_identifier="firefox_120",
         random_tls_extension_order=True
     )
-    proxies = { 'https': f'https://{proxy_str}' }
-    session.proxies.update(proxies)
 
     cookies = {
         'spid': '1691248327816_541d895417a4ec2f5cad563effefd88c_o92886xo5rqsjwsc',
@@ -167,6 +165,7 @@ def parser_mega(delivery_type, min_price, max_price, search_query, min_precent_b
         cookies=cookies,
         headers=headers,
         json=json_data,
+        proxy=f'http://{proxy_str}'
         ).json()
         
         list_goods = []
@@ -289,6 +288,7 @@ def parser_mega(delivery_type, min_price, max_price, search_query, min_precent_b
             cookies=cookies,
             headers=headers,
             json=json_data,
+            proxy=f'http://{proxy_str}'
         ).json()
 
         list_goods = []

@@ -10,8 +10,6 @@ def get_id_link(link_str, proxy_str):
             client_identifier=client_str,
             random_tls_extension_order=True
         )
-        #proxies = { 'https': f'https://{proxy_str}' } 
-        #session.proxies.update(proxies)
 
         cookies = {
             'spid': '1691248327816_541d895417a4ec2f5cad563effefd88c_o92886xo5rqsjwsc',
@@ -138,7 +136,7 @@ def get_id_link(link_str, proxy_str):
             cookies=cookies,
             headers=headers,
             json=json_data,
-            #proxy=f'https://{proxy_str}'
+            proxy=f'http://{proxy_str}'
         ).json()
 
         print(response)
