@@ -5,8 +5,9 @@ def get_id_link(link_str, proxy_str):
     client_identifier_list = ['chrome_103', 'chrome_104', 'chrome_105', 'chrome_106', 'chrome_107', 'chrome_108', 'chrome109', 'Chrome110', 'chrome111', 'chrome112', 'chrome_116_PSK', 'chrome_116_PSK_PQ', 'chrome_117', 'chrome_120', 'firefox_102', 'firefox_104', 'firefox108', 'Firefox110', 'firefox_117', 'firefox_120', 'opera_89', 'opera_90', 'safari_15_3', 'safari_15_6_1', 'safari_16_0']
 
     link = ''
-    for client_str in client_identifier_list:
-        while link == '':
+    while link == '':
+        for client_str in client_identifier_list:
+            print(client_str)
             session = tls_client.Session(
                 client_identifier=client_str,
                 random_tls_extension_order=True
