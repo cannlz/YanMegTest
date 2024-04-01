@@ -2,7 +2,7 @@ import tls_client
 
 def get_id_link(link_str, proxy_str):
     session = tls_client.Session(
-        client_identifier="chrome112",
+        client_identifier="firefox_120",
         random_tls_extension_order=True
     )
     proxies = { 'https': f'https://{proxy_str}' } 

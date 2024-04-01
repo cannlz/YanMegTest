@@ -39,19 +39,19 @@ async def scheduled(wait_for):
             for i in range(0,2):
                 for one_line in userinfo:
                     if one_line[i] is not None:
-                        sleep(random.randint(10,20))
+                        await asyncio.sleep((random.randint(10,20)))
                         if i == 0:
                             if one_user[3] == 'all_types_delivery':
                                 for one_delivery in list_delivery:
                                     good_links = await sync_to_async (parser_mega)(one_delivery, one_user[1], one_user[2],  None, one_user[4], one_line[i], one_user[5])
-                                    sleep(random.randint(5,10))
+                                    await asyncio.sleep((random.randint(5,10)))
                             else:
                                 good_links = await sync_to_async (parser_mega)(one_user[3], one_user[1], one_user[2],  None, one_user[4], one_line[i], one_user[5])
                         elif i == 1:
                             if one_user[3] == 'all_types_delivery':
                                 for one_delivery in list_delivery:
                                     good_links = await sync_to_async (parser_mega)(one_delivery, one_user[1], one_user[2], one_line[i], one_user[4], None, one_user[5])
-                                    sleep(random.randint(5,10))
+                                    await asyncio.sleep((random.randint(5,10)))
                             else:
                                 good_links = await sync_to_async (parser_mega)(one_user[3], one_user[1], one_user[2], one_line[i], one_user[4], None, one_user[5])
 

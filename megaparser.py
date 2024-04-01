@@ -6,7 +6,7 @@ import random
 def parser_mega(delivery_type, min_price, max_price, search_query, min_precent_bonus, link_id, proxy_str):
 
     session = tls_client.Session(
-        client_identifier="chrome112",
+        client_identifier="firefox_120",
         random_tls_extension_order=True
     )
     proxies = { 'https': f'https://{proxy_str}' }
