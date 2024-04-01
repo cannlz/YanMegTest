@@ -136,7 +136,7 @@ def get_id_link(link_str, proxy_str):
             cookies=cookies,
             headers=headers,
             json=json_data,
-            #proxy=f'http://{proxy_str}'
+            proxy=f'http://{proxy_str}'
         ).json()
 
         print(response)
