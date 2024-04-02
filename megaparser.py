@@ -297,6 +297,7 @@ def parser_mega(delivery_type, min_price, max_price, search_query, min_precent_b
                 proxy=f'http://{proxy_str}'
             ).json()
 
+            list_goods = []
             for i in range(44):
                 try:
                     tovar_price = response['items'][i]['price']
