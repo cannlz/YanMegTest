@@ -3,7 +3,7 @@ from time import sleep
 import random
 
 
-def parser_mega(delivery_type, min_price, max_price, search_query, min_precent_bonus, link_id, proxy_str):
+def parser_mega(delivery_type, min_price, max_price, search_query, min_precent_bonus, link_id, proxy_str, page):
 
     client_identifier_list = ['chrome_103', 'chrome_104', 'chrome_105', 'chrome_106', 'chrome_107', 'chrome_108', 'chrome109', 'Chrome110', 'chrome111', 'chrome112', 'chrome_116_PSK', 'chrome_116_PSK_PQ', 'chrome_117', 'chrome_120', 'firefox_102', 'firefox_104', 'firefox108', 'Firefox110', 'firefox_117', 'firefox_120', 'opera_89', 'opera_90', 'safari_15_3', 'safari_15_6_1', 'safari_16_0', 'safari_ios_15_5', 'safari_ios_15_6', 'safari_ios_16_0', 'safari_ios_15_6', 'okhttp4_android_7', 'okhttp4_android_8', 'okhttp4_android_9', 'okhttp4_android_10', 'okhttp4_android_11', 'okhttp4_android_12', 'okhttp4_android_13']
     for client_str in client_identifier_list:
@@ -72,259 +72,253 @@ def parser_mega(delivery_type, min_price, max_price, search_query, min_precent_b
 
 
         if link_id is not None:
-            list_goods = []
-            page = 0
-            while page != 112 and page < 112:
-                json_data = {
-                    'selectedAssumedCollectionId': str(link_id), #ID Категории дубль
-                    'collectionId': str(link_id), #ID Категории
-                    'requestVersion': 10,
-                    'limit': 44,
-                    'offset': page,
-                    'isMultiCategorySearch': False,
-                    'searchByOriginalQuery': False,
-                    'selectedSuggestParams': [],
-                    'expandedFiltersIds': [],
-                    'sorting': 1, #Фильтр от самых дешевых
-                    'ageMore18': None,
-                    'addressId': '8b153339-bc32-4948-b917-9588db7ace58#10#',
-                    'showNotAvailable': True,
-                    'selectedFilters': [
-                        {
-                            'filterId': 'OFFER_DUE_DATE_FILTER',
-                            'type': 0,
-                            'value': str(delivery_type), #Доставка
-                        },
-                        {
-                            'filterId': '88C83F68482F447C9F4E401955196697',
-                            'type': 1,
-                            'value': str(min_price), #Минимальная цена
-                        },
-                        {
-                            'filterId': '88C83F68482F447C9F4E401955196697',
-                            'type': 2,
-                            'value': str(max_price), #Максимальная цена
-                        },
-                    ],
-                    'auth': {
-                        'locationId': '63',
-                        'appPlatform': 'WEB',
-                        'appVersion': 0,
-                        'experiments': {
-                            '8': '2',
-                            '55': '2',
-                            '58': '2',
-                            '62': '1',
-                            '68': '2',
-                            '69': '1',
-                            '79': '3',
-                            '84': '2',
-                            '96': '2',
-                            '98': '1',
-                            '99': '1',
-                            '107': '2',
-                            '109': '2',
-                            '119': '1',
-                            '120': '2',
-                            '121': '2',
-                            '122': '1',
-                            '126': '1',
-                            '128': '1',
-                            '130': '1',
-                            '132': '1',
-                            '144': '3',
-                            '147': '3',
-                            '154': '1',
-                            '163': '2',
-                            '178': '1',
-                            '184': '3',
-                            '186': '1',
-                            '190': '2',
-                            '192': '2',
-                            '200': '2',
-                            '205': '2',
-                            '209': '1',
-                            '218': '1',
-                            '228': '2',
-                            '229': '2',
-                            '235': '2',
-                            '237': '2',
-                            '243': '1',
-                            '255': '2',
-                            '644': '3',
-                            '645': '2',
-                            '723': '2',
-                            '772': '1',
-                            '5779': '2',
-                            '20121': '1',
-                            '70070': '2',
-                            '85160': '2',
-                            '123999': '1',
-                            '89898989': '1',
-                        },
-                        'os': 'UNKNOWN_OS',
+            
+            json_data = {
+                'selectedAssumedCollectionId': str(link_id), #ID Категории дубль
+                'collectionId': str(link_id), #ID Категории
+                'requestVersion': 10,
+                'limit': 44,
+                'offset': page,
+                'isMultiCategorySearch': False,
+                'searchByOriginalQuery': False,
+                'selectedSuggestParams': [],
+                'expandedFiltersIds': [],
+                'sorting': 1, #Фильтр от самых дешевых
+                'ageMore18': None,
+                'addressId': '8b153339-bc32-4948-b917-9588db7ace58#10#',
+                'showNotAvailable': True,
+                'selectedFilters': [
+                    {
+                        'filterId': 'OFFER_DUE_DATE_FILTER',
+                        'type': 0,
+                        'value': str(delivery_type), #Доставка
                     },
-                }
-                response = session.post(
-                'https://megamarket.ru/api/mobile/v1/catalogService/catalog/search',
-                cookies=cookies,
-                headers=headers,
-                json=json_data,
-                proxy=f'http://{proxy_str}'
-                ).json()
-                
-                
-                for i in range(44):
+                    {
+                        'filterId': '88C83F68482F447C9F4E401955196697',
+                        'type': 1,
+                        'value': str(min_price), #Минимальная цена
+                    },
+                    {
+                        'filterId': '88C83F68482F447C9F4E401955196697',
+                        'type': 2,
+                        'value': str(max_price), #Максимальная цена
+                    },
+                ],
+                'auth': {
+                    'locationId': '63',
+                    'appPlatform': 'WEB',
+                    'appVersion': 0,
+                    'experiments': {
+                        '8': '2',
+                        '55': '2',
+                        '58': '2',
+                        '62': '1',
+                        '68': '2',
+                        '69': '1',
+                        '79': '3',
+                        '84': '2',
+                        '96': '2',
+                        '98': '1',
+                        '99': '1',
+                        '107': '2',
+                        '109': '2',
+                        '119': '1',
+                        '120': '2',
+                        '121': '2',
+                        '122': '1',
+                        '126': '1',
+                        '128': '1',
+                        '130': '1',
+                        '132': '1',
+                        '144': '3',
+                        '147': '3',
+                        '154': '1',
+                        '163': '2',
+                        '178': '1',
+                        '184': '3',
+                        '186': '1',
+                        '190': '2',
+                        '192': '2',
+                        '200': '2',
+                        '205': '2',
+                        '209': '1',
+                        '218': '1',
+                        '228': '2',
+                        '229': '2',
+                        '235': '2',
+                        '237': '2',
+                        '243': '1',
+                        '255': '2',
+                        '644': '3',
+                        '645': '2',
+                        '723': '2',
+                        '772': '1',
+                        '5779': '2',
+                        '20121': '1',
+                        '70070': '2',
+                        '85160': '2',
+                        '123999': '1',
+                        '89898989': '1',
+                    },
+                    'os': 'UNKNOWN_OS',
+                },
+            }
+            response = session.post(
+            'https://megamarket.ru/api/mobile/v1/catalogService/catalog/search',
+            cookies=cookies,
+            headers=headers,
+            json=json_data,
+            proxy=f'http://{proxy_str}'
+            ).json()
+            
+            list_goods = []
+            for i in range(44):
+                try:
+                    tovar_price = response['items'][i]['price']
+                    tovar_bonus_precent = response['items'][i]['bonusPercent']
+                    tovar_bonus_count = response['items'][i]['bonusAmount']
+                    tovar_name = response['items'][i]['goods']['title']
                     try:
-                        tovar_price = response['items'][i]['price']
-                        tovar_bonus_precent = response['items'][i]['bonusPercent']
-                        tovar_bonus_count = response['items'][i]['bonusAmount']
-                        tovar_name = response['items'][i]['goods']['title']
-                        try:
-                            tovar_seller = response['items'][i]['favoriteOffer']['merchantName']
-                        except:
-                            tovar_seller = 'err'
-                        try:
-                            tovar_link = response['items'][i]['goods']['webUrl']
-                        except:
-                            tovar_link = 'err'
-                        try:
-                            tovar_image = response['items'][i]['goods']['titleImage']
-                        except:
-                            tovar_image = 'err'
-                        if int(tovar_bonus_precent) >= int(min_precent_bonus):
-                            list_goods.append([tovar_price, tovar_bonus_precent, tovar_bonus_count, tovar_seller, tovar_link, tovar_image, tovar_name])
+                        tovar_seller = response['items'][i]['favoriteOffer']['merchantName']
                     except:
-                        pass
-                page += 28
+                        tovar_seller = 'err'
+                    try:
+                        tovar_link = response['items'][i]['goods']['webUrl']
+                    except:
+                        tovar_link = 'err'
+                    try:
+                        tovar_image = response['items'][i]['goods']['titleImage']
+                    except:
+                        tovar_image = 'err'
+                    if int(tovar_bonus_precent) >= int(min_precent_bonus):
+                        list_goods.append([tovar_price, tovar_bonus_precent, tovar_bonus_count, tovar_seller, tovar_link, tovar_image, tovar_name])
+                except:
+                    pass
             return list_goods
 
 
 
         elif search_query is not None:
-            list_goods = []
-            page = 0
-            while page != 112 and page < 112:
-                json_data = {
-                    'requestVersion': 10,
-                    'limit': 44,
-                    'offset': page,
-                    'isMultiCategorySearch': False,
-                    'searchByOriginalQuery': False,
-                    'selectedSuggestParams': [],
-                    'expandedFiltersIds': [],
-                    'sorting': 1, #Фильтр от самых дешевых
-                    'ageMore18': None,
-                    'addressId': '8b153339-bc32-4948-b917-9588db7ace58#10#',
-                    'showNotAvailable': True,
-                    'selectedFilters': [
-                        {
-                            'filterId': 'OFFER_DUE_DATE_FILTER',
-                            'type': 0,
-                            'value': str(delivery_type), #Доставка
-                        },
-                        {
-                            'filterId': '88C83F68482F447C9F4E401955196697',
-                            'type': 1,
-                            'value': str(min_price), #Минимальная цена
-                        },
-                        {
-                            'filterId': '88C83F68482F447C9F4E401955196697',
-                            'type': 2,
-                            'value': str(max_price), #Максимальная цена
-                        },
-                    ],
-                    'searchText': str(search_query), #Поисковый запрос
-                    'auth': {
-                        'locationId': '63',
-                        'appPlatform': 'WEB',
-                        'appVersion': 0,
-                        'experiments': {
-                            '8': '2',
-                            '55': '2',
-                            '58': '2',
-                            '62': '1',
-                            '68': '2',
-                            '69': '1',
-                            '79': '3',
-                            '84': '2',
-                            '96': '2',
-                            '98': '1',
-                            '99': '1',
-                            '107': '2',
-                            '109': '2',
-                            '119': '1',
-                            '120': '2',
-                            '121': '2',
-                            '122': '1',
-                            '126': '1',
-                            '128': '1',
-                            '130': '1',
-                            '132': '1',
-                            '144': '3',
-                            '147': '3',
-                            '154': '1',
-                            '163': '2',
-                            '178': '1',
-                            '184': '3',
-                            '186': '1',
-                            '190': '2',
-                            '192': '2',
-                            '200': '2',
-                            '205': '2',
-                            '209': '1',
-                            '218': '1',
-                            '228': '2',
-                            '229': '2',
-                            '235': '2',
-                            '237': '2',
-                            '243': '1',
-                            '255': '2',
-                            '644': '3',
-                            '645': '2',
-                            '723': '2',
-                            '772': '1',
-                            '5779': '2',
-                            '20121': '1',
-                            '70070': '2',
-                            '85160': '2',
-                            '123999': '1',
-                            '89898989': '1',
-                        },
-                        'os': 'UNKNOWN_OS',
+            
+            json_data = {
+                'requestVersion': 10,
+                'limit': 44,
+                'offset': page,
+                'isMultiCategorySearch': False,
+                'searchByOriginalQuery': False,
+                'selectedSuggestParams': [],
+                'expandedFiltersIds': [],
+                'sorting': 1, #Фильтр от самых дешевых
+                'ageMore18': None,
+                'addressId': '8b153339-bc32-4948-b917-9588db7ace58#10#',
+                'showNotAvailable': True,
+                'selectedFilters': [
+                    {
+                        'filterId': 'OFFER_DUE_DATE_FILTER',
+                        'type': 0,
+                        'value': str(delivery_type), #Доставка
                     },
-                }
-                response = session.post(
-                    'https://megamarket.ru/api/mobile/v1/catalogService/catalog/search',
-                    cookies=cookies,
-                    headers=headers,
-                    json=json_data,
-                    proxy=f'http://{proxy_str}'
-                ).json()
+                    {
+                        'filterId': '88C83F68482F447C9F4E401955196697',
+                        'type': 1,
+                        'value': str(min_price), #Минимальная цена
+                    },
+                    {
+                        'filterId': '88C83F68482F447C9F4E401955196697',
+                        'type': 2,
+                        'value': str(max_price), #Максимальная цена
+                    },
+                ],
+                'searchText': str(search_query), #Поисковый запрос
+                'auth': {
+                    'locationId': '63',
+                    'appPlatform': 'WEB',
+                    'appVersion': 0,
+                    'experiments': {
+                        '8': '2',
+                        '55': '2',
+                        '58': '2',
+                        '62': '1',
+                        '68': '2',
+                        '69': '1',
+                        '79': '3',
+                        '84': '2',
+                        '96': '2',
+                        '98': '1',
+                        '99': '1',
+                        '107': '2',
+                        '109': '2',
+                        '119': '1',
+                        '120': '2',
+                        '121': '2',
+                        '122': '1',
+                        '126': '1',
+                        '128': '1',
+                        '130': '1',
+                        '132': '1',
+                        '144': '3',
+                        '147': '3',
+                        '154': '1',
+                        '163': '2',
+                        '178': '1',
+                        '184': '3',
+                        '186': '1',
+                        '190': '2',
+                        '192': '2',
+                        '200': '2',
+                        '205': '2',
+                        '209': '1',
+                        '218': '1',
+                        '228': '2',
+                        '229': '2',
+                        '235': '2',
+                        '237': '2',
+                        '243': '1',
+                        '255': '2',
+                        '644': '3',
+                        '645': '2',
+                        '723': '2',
+                        '772': '1',
+                        '5779': '2',
+                        '20121': '1',
+                        '70070': '2',
+                        '85160': '2',
+                        '123999': '1',
+                        '89898989': '1',
+                    },
+                    'os': 'UNKNOWN_OS',
+                },
+            }
+            response = session.post(
+                'https://megamarket.ru/api/mobile/v1/catalogService/catalog/search',
+                cookies=cookies,
+                headers=headers,
+                json=json_data,
+                proxy=f'http://{proxy_str}'
+            ).json()
 
-                for i in range(44):
+            for i in range(44):
+                try:
+                    tovar_price = response['items'][i]['price']
+                    tovar_bonus_precent = response['items'][i]['bonusPercent']
+                    tovar_bonus_count = response['items'][i]['bonusAmount']
+                    tovar_name = response['items'][i]['goods']['title']
                     try:
-                        tovar_price = response['items'][i]['price']
-                        tovar_bonus_precent = response['items'][i]['bonusPercent']
-                        tovar_bonus_count = response['items'][i]['bonusAmount']
-                        tovar_name = response['items'][i]['goods']['title']
-                        try:
-                            tovar_seller = response['items'][i]['favoriteOffer']['merchantName']
-                        except:
-                            tovar_seller = 'err'
-                        try:
-                            tovar_link = response['items'][i]['goods']['webUrl']
-                        except:
-                            tovar_link = 'err'
-                        try:
-                            tovar_image = response['items'][i]['goods']['titleImage']
-                        except:
-                            tovar_image = 'err'
-                        if int(tovar_bonus_precent) >= int(min_precent_bonus):
-                            list_goods.append([tovar_price, tovar_bonus_precent, tovar_bonus_count, tovar_seller, tovar_link, tovar_image, tovar_name])
+                        tovar_seller = response['items'][i]['favoriteOffer']['merchantName']
                     except:
-                        pass
-                page += 28
+                        tovar_seller = 'err'
+                    try:
+                        tovar_link = response['items'][i]['goods']['webUrl']
+                    except:
+                        tovar_link = 'err'
+                    try:
+                        tovar_image = response['items'][i]['goods']['titleImage']
+                    except:
+                        tovar_image = 'err'
+                    if int(tovar_bonus_precent) >= int(min_precent_bonus):
+                        list_goods.append([tovar_price, tovar_bonus_precent, tovar_bonus_count, tovar_seller, tovar_link, tovar_image, tovar_name])
+                except:
+                    pass
             return list_goods
 
 

@@ -38,38 +38,91 @@ async def scheduled(wait_for):
             userinfo = baseMain.execute(f'SELECT link_id, search_query FROM list_data WHERE user_id = {one_user[0]}').fetchall()
             for i in range(0,2):
                 for one_line in userinfo:
+                    page = 0
                     if one_line[i] is not None:
                         await asyncio.sleep((random.randint(10,20)))
                         if i == 0:
-                            if one_user[3] == 'all_types_delivery':
-                                for one_delivery in list_delivery:
-                                    good_links = await sync_to_async (parser_mega)(one_delivery, one_user[1], one_user[2],  None, one_user[4], one_line[i], one_user[5])
-                                    await asyncio.sleep((random.randint(5,10)))
-                            else:
-                                good_links = await sync_to_async (parser_mega)(one_user[3], one_user[1], one_user[2],  None, one_user[4], one_line[i], one_user[5])
-                        elif i == 1:
-                            if one_user[3] == 'all_types_delivery':
-                                for one_delivery in list_delivery:
-                                    good_links = await sync_to_async (parser_mega)(one_delivery, one_user[1], one_user[2], one_line[i], one_user[4], None, one_user[5])
-                                    await asyncio.sleep((random.randint(5,10)))
-                            else:
-                                good_links = await sync_to_async (parser_mega)(one_user[3], one_user[1], one_user[2], one_line[i], one_user[4], None, one_user[5])
 
-                        for one_message in good_links:
-                            check_sended_links = baseMain.execute(f'SELECT link, price, precent_bonus FROM used_links WHERE link = "{one_message[4]}"').fetchone()
-                            if check_sended_links is not None:
-                                if check_sended_links[1] > int(one_message[0]) or check_sended_links[1] < int(one_message[0]):
-                                    baseMain.execute(f'UPDATE used_links SET price = {one_message[0]} WHERE link = "{one_message[4]}"')
-                                    baseMain.commit()
-                                
-                                if check_sended_links[2] > int(one_message[1]) or check_sended_links[2] < int(one_message[1]):
-                                    baseMain.execute(f'UPDATE used_links SET precent_bonus = {one_message[1]} WHERE link = "{one_message[4]}"')
-                                    baseMain.commit() 
+                            if one_user[3] == 'all_types_delivery':
+                                for one_delivery in list_delivery:
+                                    while page <= 112:
+                                        good_links = await sync_to_async (parser_mega)(one_delivery, one_user[1], one_user[2],  None, one_user[4], one_line[i], one_user[5], page)
+                                        for one_message in good_links:
+                                            check_sended_links = baseMain.execute(f'SELECT link, price, precent_bonus FROM used_links WHERE link = "{one_message[4]}"').fetchone()
+                                            if check_sended_links is not None:
+                                                if check_sended_links[1] > int(one_message[0]) or check_sended_links[1] < int(one_message[0]):
+                                                    baseMain.execute(f'UPDATE used_links SET price = {one_message[0]} WHERE link = "{one_message[4]}"')
+                                                    baseMain.commit()
+                                                
+                                                if check_sended_links[2] > int(one_message[1]) or check_sended_links[2] < int(one_message[1]):
+                                                    baseMain.execute(f'UPDATE used_links SET precent_bonus = {one_message[1]} WHERE link = "{one_message[4]}"')
+                                                    baseMain.commit() 
+                                            else:
+                                                baseMain.execute(f'INSERT INTO used_links (link, price, precent_bonus) VALUES ("{one_message[4]}", {one_message[0]}, {one_message[1]});')
+                                                baseMain.commit()
+                                                await bot.send_photo(chat_id=one_user[0], photo=one_message[5], caption=f'Название: {one_message[6]}\n\nЦена: {one_message[0]} руб.\nПроцент бонусов: {one_message[1]}%\nКоличество бонусов: {one_message[2]}\nПродавец: {one_message[3]}\n\nСсылка на товар: {one_message[4]}', parse_mode='HTML')
+                                        page += 28
+                                        await asyncio.sleep((random.randint(5,10)))
                             else:
-                                baseMain.execute(f'INSERT INTO used_links (link, price, precent_bonus) VALUES ("{one_message[4]}", {one_message[0]}, {one_message[1]});')
-                                baseMain.commit()
-                                await bot.send_photo(chat_id=one_user[0], photo=one_message[5], caption=f'Название: {one_message[6]}\n\nЦена: {one_message[0]} руб.\nПроцент бонусов: {one_message[1]}%\nКоличество бонусов: {one_message[2]}\nПродавец: {one_message[3]}\n\nСсылка на товар: {one_message[4]}', parse_mode='HTML')
-                
+                                while page <= 112:
+                                    good_links = await sync_to_async (parser_mega)(one_user[3], one_user[1], one_user[2],  None, one_user[4], one_line[i], one_user[5], page)
+                                    for one_message in good_links:
+                                        check_sended_links = baseMain.execute(f'SELECT link, price, precent_bonus FROM used_links WHERE link = "{one_message[4]}"').fetchone()
+                                        if check_sended_links is not None:
+                                            if check_sended_links[1] > int(one_message[0]) or check_sended_links[1] < int(one_message[0]):
+                                                baseMain.execute(f'UPDATE used_links SET price = {one_message[0]} WHERE link = "{one_message[4]}"')
+                                                baseMain.commit()
+                                            
+                                            if check_sended_links[2] > int(one_message[1]) or check_sended_links[2] < int(one_message[1]):
+                                                baseMain.execute(f'UPDATE used_links SET precent_bonus = {one_message[1]} WHERE link = "{one_message[4]}"')
+                                                baseMain.commit() 
+                                        else:
+                                            baseMain.execute(f'INSERT INTO used_links (link, price, precent_bonus) VALUES ("{one_message[4]}", {one_message[0]}, {one_message[1]});')
+                                            baseMain.commit()
+                                            await bot.send_photo(chat_id=one_user[0], photo=one_message[5], caption=f'Название: {one_message[6]}\n\nЦена: {one_message[0]} руб.\nПроцент бонусов: {one_message[1]}%\nКоличество бонусов: {one_message[2]}\nПродавец: {one_message[3]}\n\nСсылка на товар: {one_message[4]}', parse_mode='HTML')
+                                    page += 28
+                                    await asyncio.sleep((random.randint(5,10)))
+                        elif i == 1:
+
+                            if one_user[3] == 'all_types_delivery':
+                                for one_delivery in list_delivery:
+                                    while page <= 112:
+                                        good_links = await sync_to_async (parser_mega)(one_delivery, one_user[1], one_user[2], one_line[i], one_user[4], None, one_user[5], page)
+                                        for one_message in good_links:
+                                            check_sended_links = baseMain.execute(f'SELECT link, price, precent_bonus FROM used_links WHERE link = "{one_message[4]}"').fetchone()
+                                            if check_sended_links is not None:
+                                                if check_sended_links[1] > int(one_message[0]) or check_sended_links[1] < int(one_message[0]):
+                                                    baseMain.execute(f'UPDATE used_links SET price = {one_message[0]} WHERE link = "{one_message[4]}"')
+                                                    baseMain.commit()
+                                                
+                                                if check_sended_links[2] > int(one_message[1]) or check_sended_links[2] < int(one_message[1]):
+                                                    baseMain.execute(f'UPDATE used_links SET precent_bonus = {one_message[1]} WHERE link = "{one_message[4]}"')
+                                                    baseMain.commit() 
+                                            else:
+                                                baseMain.execute(f'INSERT INTO used_links (link, price, precent_bonus) VALUES ("{one_message[4]}", {one_message[0]}, {one_message[1]});')
+                                                baseMain.commit()
+                                                await bot.send_photo(chat_id=one_user[0], photo=one_message[5], caption=f'Название: {one_message[6]}\n\nЦена: {one_message[0]} руб.\nПроцент бонусов: {one_message[1]}%\nКоличество бонусов: {one_message[2]}\nПродавец: {one_message[3]}\n\nСсылка на товар: {one_message[4]}', parse_mode='HTML')
+                                        page += 28
+                                        await asyncio.sleep((random.randint(5,10)))
+                            else:
+                                while page <= 112:
+                                    good_links = await sync_to_async (parser_mega)(one_user[3], one_user[1], one_user[2], one_line[i], one_user[4], None, one_user[5], page)
+                                    for one_message in good_links:
+                                        check_sended_links = baseMain.execute(f'SELECT link, price, precent_bonus FROM used_links WHERE link = "{one_message[4]}"').fetchone()
+                                        if check_sended_links is not None:
+                                            if check_sended_links[1] > int(one_message[0]) or check_sended_links[1] < int(one_message[0]):
+                                                baseMain.execute(f'UPDATE used_links SET price = {one_message[0]} WHERE link = "{one_message[4]}"')
+                                                baseMain.commit()
+                                            
+                                            if check_sended_links[2] > int(one_message[1]) or check_sended_links[2] < int(one_message[1]):
+                                                baseMain.execute(f'UPDATE used_links SET precent_bonus = {one_message[1]} WHERE link = "{one_message[4]}"')
+                                                baseMain.commit() 
+                                        else:
+                                            baseMain.execute(f'INSERT INTO used_links (link, price, precent_bonus) VALUES ("{one_message[4]}", {one_message[0]}, {one_message[1]});')
+                                            baseMain.commit()
+                                            await bot.send_photo(chat_id=one_user[0], photo=one_message[5], caption=f'Название: {one_message[6]}\n\nЦена: {one_message[0]} руб.\nПроцент бонусов: {one_message[1]}%\nКоличество бонусов: {one_message[2]}\nПродавец: {one_message[3]}\n\nСсылка на товар: {one_message[4]}', parse_mode='HTML')
+                                    page += 28
+                                    await asyncio.sleep((random.randint(5,10)))
     await asyncio.sleep(wait_for)
 
 
