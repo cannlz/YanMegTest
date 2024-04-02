@@ -159,7 +159,10 @@ async def process_start_command(message: types.Message):
 
 #ГЛАВНОЕ МЕНЮ CALLBACK
 @dp.callback_query_handler(text_startswith="start", state="*")
-async def start_callback(call: types.CallbackQuery):
+async def start_callback(call: types.CallbackQuery, state: FSMContext):
+    current_state = await state.get_state()
+    if current_state:  
+        await state.finish()
     await call.message.delete()
     markup = InlineKeyboardMarkup()  # создаём клавиатуру
     markup.row_width = 1  # кол-во кнопок в строке
