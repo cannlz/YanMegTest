@@ -385,7 +385,7 @@ async def parser(message: types.Message):
     markup.row_width = 1  # кол-во кнопок в строке
     markup.add(InlineKeyboardButton(text="❌Закрыть", callback_data="start"))
     await message.delete()
-    await message.answer("Введите строку с прокси РОССИЯ http/https(1 шт):\n\nФормат прокси: username:password@ip:port", reply_markup=markup)
+    await message.answer("Введите строку с прокси РОССИЯ http/https(1 шт):\n\nФормат прокси: username:password@ip:port\n\nКупить можно тут: proxywhite.com", reply_markup=markup)
     await AwaitMessages.message_add_proxy.set()
 
 #ДОБАВЛЕНИЕ ПРОКСИ FSM МАШИНА

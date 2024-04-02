@@ -156,4 +156,4 @@ def get_id_link(link_str, proxy_str):
             except:
                 link = ''
 
-get_id_link('https://megamarket.ru/catalog/smartfony-apple/', 'cgVBeis1:XYF3aqL7@195.19.169.222:63342')
+get_id_link('https://megamarket.ru/catalog/smartfony-apple/', 'l0xkmyOG2cnD:yellowandrew501@185.22.155.230:16282')
